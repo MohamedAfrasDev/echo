@@ -1,5 +1,5 @@
 {
-    "name": "@workspace/math",
+    "name": "@workspace/backend",
     "type": "module",
     "scripts": {
         "dev": "convex dev",
