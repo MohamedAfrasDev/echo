@@ -1,10 +1,10 @@
-import { DashboarLayout } from "@/modules/dashboard/ui/layouts/dashboard-layout"
+import { DashboardLayout } from "@/modules/dashboard/ui/layouts/dashboard-layout"
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <DashboarLayout>
+        <DashboardLayout>
             {children}
-        </DashboarLayout>
+        </DashboardLayout>
     )
 }
 
