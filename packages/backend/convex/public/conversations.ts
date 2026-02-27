@@ -1,6 +1,9 @@
 import { mutation, query } from "../_generated/server";
 
 import { ConvexError, v } from "convex/values";
+import { supportAgent } from "../system/ai/agents/supportAgent";
+import { components } from "../_generated/api";
+import { saveMessage } from "@convex-dev/agent";
 
 
 
@@ -14,8 +17,8 @@ export const getOne = query({
 
         if (!session || session.expiresAt < Date.now()) {
             throw new ConvexError({
-                code: "UNAUTHORIZED",
-                message: "Invalid session"
+                code: "NOT_FOUND",
+                message: "Conversation not found"
             })
         }
 
@@ -23,6 +26,13 @@ export const getOne = query({
 
         if (!conversation) {
             return null;
+        }
+
+        if (conversation.contactSessionId !== args.contactSessionId) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Invalid session"
+            })
         }
 
         return {
@@ -50,12 +60,23 @@ export const create = mutation({
             });
         }
 
+        const { threadId } = await supportAgent.createThread(ctx, {
+            userId: args.organizationId
+        });
+
+        await saveMessage(ctx, components.agent, {
+            threadId,
+            message: {
+                role: "assistant",
+                content: "Hello! How can I help you today?"
+            }
+        })
 
         const conversationId = await ctx.db.insert("conversations", {
             contactSessionId: session._id,
             status: "unresolved",
             organizationId: args.organizationId,
-            threadId: "123"
+            threadId: threadId
         });
 
         return conversationId;
