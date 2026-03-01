@@ -24,7 +24,8 @@
     "next.config.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "modules/widget/hooks/use-infinite-scroll.tss"
   ],
   "exclude": [
     "node_modules"
