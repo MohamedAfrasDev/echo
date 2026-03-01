@@ -17,6 +17,9 @@ import { api } from "@workspace/backend/convex/_generated/api";
 import { useThreadMessages, toUIMessages } from "@convex-dev/agent/react";
 import { Form, useForm } from "react-hook-form";
 import { FormField } from "@workspace/ui/components/form";
+import { useInfiniteScroll } from "../src/hooks/use-infinite-scroll";
+import { InfiniteScrollTrigger } from "../components/infinite-scroll-trigger";
+import { DicebearAvatar } from "@workspace/ui/components/dicebar-avatar";
 
 const formSchema = z.object({
     message: z.string().min(1, "Message is required"),
@@ -52,6 +55,12 @@ export const WidgetChatScreen = () => {
             : "skip",
         { initialNumItems: 10 }
     )
+
+    const { topElementRef, handleLoadMore, canLoadMore, isLoadingMore } = useInfiniteScroll({
+        status: messages.status,
+        loadMore: messages.loadMore,
+        loadSize: 10
+    })
 
     const onBack = () => {
         setConversationId(null);
@@ -94,12 +103,17 @@ export const WidgetChatScreen = () => {
 
             <AIConversation>
                 <AIConversationContent>
+                    <InfiniteScrollTrigger canLoadMore={canLoadMore} isLoadingMore={isLoadingMore} onLoadMore={handleLoadMore} ref={topElementRef} />
                     {toUIMessages(messages.results ?? [])?.map((message) => {
                         return (
                             <AIMessage from={message.role === "user" ? "user" : "assistant"} key={message.id}>
                                 <AIMessageContent>
                                     <AIResponse>{message.text}</AIResponse>
                                 </AIMessageContent>
+
+                                {message.role === "assistant" && (
+                                    <DicebearAvatar seed="assistant" imageUrl="/logo.svg" size={32} />
+                                )}
                             </AIMessage>
                         )
                     })}
