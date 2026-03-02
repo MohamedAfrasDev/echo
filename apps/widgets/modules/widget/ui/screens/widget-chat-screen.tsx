@@ -104,19 +104,22 @@ export const WidgetChatScreen = () => {
             <AIConversation>
                 <AIConversationContent>
                     <InfiniteScrollTrigger canLoadMore={canLoadMore} isLoadingMore={isLoadingMore} onLoadMore={handleLoadMore} ref={topElementRef} />
-                    {toUIMessages(messages.results ?? [])?.map((message) => {
-                        return (
-                            <AIMessage from={message.role === "user" ? "user" : "assistant"} key={message.id}>
-                                <AIMessageContent>
-                                    <AIResponse>{message.text}</AIResponse>
-                                </AIMessageContent>
+                    {toUIMessages(messages.results ?? [])
+                        ?.filter((message) => message.role === "user" || (message.text && message.text.trim() !== ""))
+                        ?.map((message) => {
+                            return (
+                                <AIMessage from={message.role === "user" ? "user" : "assistant"} key={message.id}>
+                                    <AIMessageContent>
+                                        <AIResponse>{message.text}</AIResponse>
+                                    </AIMessageContent>
 
-                                {message.role === "assistant" && (
-                                    <DicebearAvatar seed="assistant" imageUrl="/logo.svg" size={32} />
-                                )}
-                            </AIMessage>
-                        )
-                    })}
+
+                                    {message.role === "assistant" && (
+                                        <DicebearAvatar seed="assistant" imageUrl="/logo.svg" size={32} />
+                                    )}
+                                </AIMessage>
+                            )
+                        })}
                 </AIConversationContent>
             </AIConversation>
 

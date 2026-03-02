@@ -5,8 +5,10 @@ import { Agent } from "@convex-dev/agent";
 
 import { components } from "../../../_generated/api";
 
+
 export const supportAgent = new Agent(components.agent, {
     name: "supportAgent",
     languageModel: openai("gpt-4o-mini"),
-    instructions: "You are a customer support agent",
+    instructions: `You are a customer support agent. Use "resolveConversation" tool when user expresses finalization of the conversation. Use "escalateConversation" tool when use expresses frustration, or requests a human explicity`,
+
 })
