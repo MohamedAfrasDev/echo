@@ -5,10 +5,8 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { useState } from "react";
-import { useAction, useMutation } from "convex/react";
+import { useAction } from "convex/react";
 import { api } from "@workspace/backend/convex/_generated/api";
-import { toast } from "sonner";
-import { useQuery } from "convex/react";
 import { Dropzone, DropzoneContent, DropzoneEmptyState } from "@workspace/ui/components/dropzone";
 
 interface UploadDialogProps {
@@ -36,10 +34,17 @@ export const UploadDialog = ({
         const file = acceptedFiles[0];
 
         if (file) {
+            const previousSelectedName = uploadedFiles[0]?.name;
+
             setUploadFiles([file]);
-            if (!uploadForm.filename) {
-                setUploadForm((prev) => ({ ...prev, filename: file.name }))
-            }
+            setUploadForm((prev) => {
+                const shouldAutofill =
+                    !prev.filename || prev.filename === previousSelectedName;
+                return {
+                    ...prev,
+                    filename: shouldAutofill ? file.name : prev.filename,
+                };
+            });
         }
     };
 
@@ -72,16 +77,26 @@ export const UploadDialog = ({
     }
 
 
-    const handleCancel = () => {
-        onOpenChange(false);
+    const resetForm = () => {
         setUploadFiles([]);
         setUploadForm({
             category: "",
             filename: "",
         });
+    };
+
+    const handleCancel = () => {
+        onOpenChange(false);
     }
+
+    const handleOpenChange = (newOpen: boolean) => {
+        if (!newOpen) {
+            resetForm();
+        }
+        onOpenChange(newOpen);
+    };
     return (
-        <Dialog onOpenChange={onOpenChange} open={open}>
+        <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>

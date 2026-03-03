@@ -184,23 +184,37 @@ export const list = query({
             return { page: [], isDone: true, continueCursor: "" };
         }
 
-        const results = await rag.list(ctx, {
-            namespaceId: namespace.namespaceId,
-            paginationOpts: args.paginationOpts,
-        });
+        const filteredPage: PublicFile[] = [];
+        let currentCursor = args.paginationOpts.cursor ?? null;
+        let isDone = false;
 
-        const files = await Promise.all(
-            results.page.map((entry) => convertEntryToPublicFile(ctx, entry))
-        );
+        while (filteredPage.length < args.paginationOpts.numItems && !isDone) {
+            const results = await rag.list(ctx, {
+                namespaceId: namespace.namespaceId,
+                paginationOpts: {
+                    ...args.paginationOpts,
+                    cursor: currentCursor,
+                    numItems: args.paginationOpts.numItems - filteredPage.length,
+                },
+            });
 
-        const filteredFiles = args.category
-            ? files.filter((file) => file.category === args.category)
-            : files;
+            const files = await Promise.all(
+                results.page.map((entry) => convertEntryToPublicFile(ctx, entry))
+            );
+
+            const matchedFiles = args.category
+                ? files.filter((file) => file.category === args.category)
+                : files;
+
+            filteredPage.push(...matchedFiles);
+            currentCursor = results.continueCursor;
+            isDone = results.isDone;
+        }
 
         return {
-            page: filteredFiles,
-            isDone: results.isDone,
-            continueCursor: results.continueCursor
+            page: filteredPage,
+            isDone,
+            continueCursor: currentCursor ?? ""
         }
     }
 });
@@ -279,6 +293,9 @@ function formatFileSize(bytes: number): string {
 
     const k = 1024;
     const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${Number.parseFloat((bytes / k ** 1).toFixed(1))} ${sizes[i]}`
+    const i = Math.min(
+        Math.floor(Math.log(bytes) / Math.log(k)),
+        sizes.length - 1
+    );
+    return `${Number.parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`
 }

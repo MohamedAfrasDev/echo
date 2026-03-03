@@ -79,6 +79,13 @@ export const create = mutation({
             });
         }
 
+        if (conversation.organizationId !== orgId) {
+            throw new ConvexError({
+                code: "FORBIDDEN",
+                message: "You are not authorized to access this conversation"
+            })
+        }
+
         if (conversation.status === "resolved") {
             throw new ConvexError({
                 code: "BAD_REQUEST",
