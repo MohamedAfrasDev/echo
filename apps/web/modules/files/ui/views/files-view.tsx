@@ -128,8 +128,13 @@ export const FilesView = () => {
                                             <TableCell className='px-6 py-4'>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button className='size-8 p-0' size="sm" variant="ghost">
-                                                            <MoreHorizontalIcon />
+                                                        <Button
+                                                            aria-label={`Actions for ${file.name}`}
+                                                            className='size-8 p-0'
+                                                            size="sm"
+                                                            variant="ghost"
+                                                        >
+                                                            <MoreHorizontalIcon aria-hidden="true" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align='end'>
