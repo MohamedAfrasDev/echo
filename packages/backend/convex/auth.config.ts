@@ -11,4 +11,3 @@ export default {
     ],
 
 } satisfies AuthConfig;
-console.log("JWT ISSUER:", process.env.CLERK_JWT_ISSUER_DOMAIN);
