@@ -7,6 +7,7 @@ import { saveMessage } from "@convex-dev/agent";
 import { threadId } from "worker_threads";
 import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
+import { OPERATOR_MESSAGE_ENHANCEMENT_PROMPT } from "../system/ai/constants";
 export const enhanceResponse = action({
     args: {
         prompt: v.string(),
@@ -35,7 +36,7 @@ export const enhanceResponse = action({
         const response = await generateText({
             model: openai("gpt-4o-mini"),
             messages: [
-                { role: "system", content: "Enhance the operator's message to be more professional, clear, and helpful while maintaining their intent and key information. Return only the enhanced message." },
+                { role: "system", content: OPERATOR_MESSAGE_ENHANCEMENT_PROMPT },
                 { role: "user", content: args.prompt }
             ]
 
