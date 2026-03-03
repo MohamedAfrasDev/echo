@@ -72,16 +72,26 @@ export const UploadDialog = ({
     }
 
 
-    const handleCancel = () => {
-        onOpenChange(false);
+    const resetForm = () => {
         setUploadFiles([]);
         setUploadForm({
             category: "",
             filename: "",
         });
+    };
+
+    const handleDialogOpenChange = (nextOpen: boolean) => {
+        if (!nextOpen) {
+            resetForm();
+        }
+        onOpenChange(nextOpen);
+    };
+
+    const handleCancel = () => {
+        handleDialogOpenChange(false);
     }
     return (
-        <Dialog onOpenChange={onOpenChange} open={open}>
+        <Dialog onOpenChange={handleDialogOpenChange} open={open}>
             <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>
